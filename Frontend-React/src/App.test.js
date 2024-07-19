@@ -37,8 +37,7 @@ describe('Todo List App', () => {
   test('marks a todo item as completed', async () => {
     fetchTodo.mockResolvedValueOnce({ status: 200, data: [{ id: 1, description: 'Test Todo', isCompleted: false }] });
     render(<App />);
-    
-    // Wait for the todo items to be rendered
+
     await waitFor(() => {
       expect(screen.getByText('Test Todo')).toBeInTheDocument();
     });

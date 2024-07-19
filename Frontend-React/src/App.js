@@ -14,11 +14,11 @@ const App = () => {
   useEffect(() => {
     getItems();
   }, [])
-
+ //moved the code for add todo and get todo to components folder
   const handleDescriptionChange = (event) => {
     setDescription(event.target.value);
   }
-
+// get all todo list items
   const getItems = async () => {
     try {
 
@@ -34,6 +34,7 @@ const App = () => {
     }
   }
 
+// add new todo handler
   const handleAdd = async () => {
     try {
 
@@ -51,7 +52,7 @@ const App = () => {
   function handleClear() {
     setDescription('')
   }
-
+// mark the todo complete
   const handleMarkAsComplete = async (item) => {
     try {
       const completedItem = { ...item, isCompleted: true };
