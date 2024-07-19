@@ -31,7 +31,6 @@ const App = () => {
       }
     } catch (error) {
       toast("Unable to get Todos");
-      console.error(error)
     }
   }
 
@@ -69,7 +68,7 @@ const App = () => {
 
   return (
     <div className="App">
-      <ToastContainer position="top-center"/>
+      <ToastContainer position="top-center" />
 
       <Container>
         <Row>
