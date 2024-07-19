@@ -44,8 +44,9 @@ namespace TodoList.Api.Controllers
 
         // PUT: api/TodoItems/... 
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutTodoItem(Guid id, TodoItem todoItem)
+        public async Task<IActionResult> PutTodoItem(Guid id,TodoItem todoItem)
         {
+            
             if (id != todoItem.Id)
             {
                 return BadRequest();
@@ -68,8 +69,15 @@ namespace TodoList.Api.Controllers
                     throw;
                 }
             }
+             var result = await _context.TodoItems.FindAsync(id);
 
-            return NoContent();
+            if (result == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(result); 
+           // return NoContent();
         } 
 
         // POST: api/TodoItems 

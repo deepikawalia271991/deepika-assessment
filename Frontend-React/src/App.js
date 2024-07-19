@@ -1,100 +1,50 @@
-import './App.css'
-import { Image, Alert, Button, Container, Row, Col, Form, Table, Stack } from 'react-bootstrap'
 import React, { useState, useEffect } from 'react'
-
-const axios = require('axios')
+import './App.css'
+import AddTodoItem from './components/AddTodoItem'
+import TodoItems from './components/TodoItems'
+import 'react-toastify/dist/ReactToastify.css';
+import { ToastContainer, toast } from 'react-toastify';
+import { Image, Alert, Container, Row, Col } from 'react-bootstrap'
+import { fetchTodo, markCompleted, postTodo } from './api/todoService'
 
 const App = () => {
   const [description, setDescription] = useState('')
   const [items, setItems] = useState([])
 
   useEffect(() => {
-    // todo
+    getItems();
   }, [])
 
-  const renderAddTodoItemContent = () => {
-    return (
-      <Container>
-        <h1>Add Item</h1>
-        <Form.Group as={Row} className="mb-3" controlId="formAddTodoItem">
-          <Form.Label column sm="2">
-            Description
-          </Form.Label>
-          <Col md="6">
-            <Form.Control
-              type="text"
-              placeholder="Enter description..."
-              value={description}
-              onChange={handleDescriptionChange}
-            />
-          </Col>
-        </Form.Group>
-        <Form.Group as={Row} className="mb-3 offset-md-2" controlId="formAddTodoItem">
-          <Stack direction="horizontal" gap={2}>
-            <Button variant="primary" onClick={() => handleAdd()}>
-              Add Item
-            </Button>
-            <Button variant="secondary" onClick={() => handleClear()}>
-              Clear
-            </Button>
-          </Stack>
-        </Form.Group>
-      </Container>
-    )
-  }
-
-  const renderTodoItemsContent = () => {
-    return (
-      <>
-        <h1>
-          Showing {items.length} Item(s){' '}
-          <Button variant="primary" className="pull-right" onClick={() => getItems()}>
-            Refresh
-          </Button>
-        </h1>
-
-        <Table striped bordered hover>
-          <thead>
-            <tr>
-              <th>Id</th>
-              <th>Description</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {items.map((item) => (
-              <tr key={item.id}>
-                <td>{item.id}</td>
-                <td>{item.description}</td>
-                <td>
-                  <Button variant="warning" size="sm" onClick={() => handleMarkAsComplete(item)}>
-                    Mark as completed
-                  </Button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </Table>
-      </>
-    )
-  }
-
   const handleDescriptionChange = (event) => {
-    // todo
+    setDescription(event.target.value);
   }
 
-  async function getItems() {
+  const getItems = async () => {
     try {
-      alert('todo')
+
+      const { status, data } = await fetchTodo();
+      if (status === 200 && data.length > 0) {
+        setItems(data);
+      }
+      else {
+        toast("No todos available");
+      }
     } catch (error) {
+      toast("Unable to get Todos");
       console.error(error)
     }
   }
 
-  async function handleAdd() {
+  const handleAdd = async () => {
     try {
-      alert('todo')
+
+      const { status, data } = await postTodo(description, false);
+      if (status === 201 && data.id) {
+        getItems();
+        toast("Todo added succesfully!");
+      }
     } catch (error) {
+      toast("Unable to add Todo");
       console.error(error)
     }
   }
@@ -103,16 +53,24 @@ const App = () => {
     setDescription('')
   }
 
-  async function handleMarkAsComplete(item) {
+  const handleMarkAsComplete = async (item) => {
     try {
-      alert('todo')
+      const completedItem = { ...item, isCompleted: true };
+      const { status, data } = await markCompleted(completedItem);
+      if (status === 200 && data.isCompleted) {
+        getItems()
+        toast("Todo completed succesfully!");
+      }
     } catch (error) {
+      toast("Unable to mark completed");
       console.error(error)
     }
   }
 
   return (
     <div className="App">
+      <ToastContainer position="top-center"/>
+
       <Container>
         <Row>
           <Col>
@@ -143,11 +101,15 @@ const App = () => {
           </Col>
         </Row>
         <Row>
-          <Col>{renderAddTodoItemContent()}</Col>
+          <Col>
+            <AddTodoItem description={description} handleDescriptionChange={handleDescriptionChange} handleAdd={handleAdd} handleClear={handleClear} />
+          </Col>
         </Row>
         <br />
         <Row>
-          <Col>{renderTodoItemsContent()}</Col>
+          <Col>
+            <TodoItems items={items} getItems={getItems} handleMarkAsComplete={handleMarkAsComplete} />
+          </Col>
         </Row>
       </Container>
       <footer className="page-footer font-small teal pt-4">
